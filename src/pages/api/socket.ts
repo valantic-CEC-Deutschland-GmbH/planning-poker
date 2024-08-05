@@ -1,6 +1,10 @@
 import { Server } from 'socket.io'
+import {getUser} from "@/utils/user";
+import {redirect} from "next/navigation";
 
-const SocketHandler = (req: any, res: any) => {
+const SocketHandler = async (req: any, res: any) => {
+
+
   if (res.socket.server.io) {
     console.log('Socket is already running')
   } else {
