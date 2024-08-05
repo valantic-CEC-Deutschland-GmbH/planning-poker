@@ -1,6 +1,9 @@
 import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { toastDefaultOptions } from "@/components/ui/toast/toast";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -14,6 +17,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
         <html className="min-h-dvh h-full bg-base-100">
             <body className="h-full">
                 {children}
+                <ToastContainer {...toastDefaultOptions} />
             </body>
         </html>
     );

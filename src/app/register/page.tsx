@@ -1,5 +1,4 @@
 import Link from "next/link";
-import LoginForm from "@/components/login/form";
 import {getUser} from "@/utils/user";
 import {redirect} from "next/navigation";
 import RegisterForm from "@/components/register/form";
@@ -20,7 +19,7 @@ export default async function Login() {
                         className="mx-auto h-10 w-auto"
                     />
                     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-primary">
-                        Sign in to your account
+                        Create an account
                     </h2>
                 </div>
 

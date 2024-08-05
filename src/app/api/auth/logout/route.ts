@@ -1,7 +1,7 @@
 import { lucia } from "@/utils/auth";
 import {cookies} from "next/headers";
 
-export async function GET(request: Request, server) {
+export async function GET(request: Request) {
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null
 
     if (!sessionId) {
