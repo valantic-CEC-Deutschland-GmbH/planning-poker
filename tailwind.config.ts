@@ -19,5 +19,33 @@ const config: Config = {
     require('@tailwindcss/forms'),
     require('daisyui'),
   ],
+  daisyui: {
+    themes: [
+      {
+        valanticLight: {
+          "primary": "#FF4B4B",
+          "secondary": "#FF744F",
+          "accent": "#F99E49",
+          "neutral": "#1A2025",
+          "base-100": "#ffffff",
+          "info": "#38bdf8",
+          "success": "#a3e635",
+          "warning": "#f97316",
+          "error": "#f43f5e",
+        },
+        valanticDark: {
+          "primary": "#FF4B4B",
+          "secondary": "#FF744F",
+          "accent": "#F99E49",
+          "neutral": "#ffffff",
+          "base-100": "#1A2025",
+          "info": "#38bdf8",
+          "success": "#a3e635",
+          "warning": "#f97316",
+          "error": "#f43f5e",
+        },
+      },
+    ],
+  },
 };
 export default config;

@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px var(--fallback-b1,oklch(var(--b1)/var(--tw-bg-opacity))) inset !important; /* Adjust the color to match your form background */
+        -webkit-text-fill-color: var(--fallback-n,oklch(var(--n)/var(--tw-text-opacity))) !important;
+    }
+  }

@@ -1,11 +1,12 @@
 import { lucia } from "@/utils/auth";
 import {cookies} from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function GET(request: Request) {
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null
 
     if (!sessionId) {
-        return Response.json({}, {status: 401})
+        redirect('/login')
     }
 
     await lucia.invalidateSession(sessionId);
@@ -14,5 +15,5 @@ export async function GET(request: Request) {
 
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
-    return Response.json({}, {status: 200})
+    redirect('/login')
 }

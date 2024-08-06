@@ -9,7 +9,7 @@ export default function Input(config: InputInterface) {
                 placeholder={config.placeholder}
                 autoComplete={config.autocomplete}
                 onChange={e => config.setter(e.target.value)}
-                className='grow focus:outline-none focus-visible:ring-0 border-0'
+                className='grow focus:outline-none focus-visible:ring-0 border-0 text-neutral'
             />
         </label>
     )

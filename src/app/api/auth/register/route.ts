@@ -15,11 +15,14 @@ export async function POST(request: Request) {
     const plainPassword = data.password
     const firstName = data.firstName
     const lastName = data.lastName
+    const domain = process.env.EMAIL_DOMAIN;
+    const pattern = new RegExp(`^[a-zA-Z0-9._%+-]+@${domain?.replace('.', '\\.')}$`);
 
     if (!email) responseData.errors.push('Email is not provided')
     if (!plainPassword) responseData.errors.push('Password is not provided')
     if (!firstName) responseData.errors.push('First name is not provided')
     if (!lastName) responseData.errors.push('Last name is not provided')
+    if (!pattern.test(email)) responseData.errors.push('Email domain is not allowed')
 
     if (responseData.errors.length > 0) {
         return Response.json(responseData, {status: 400})
