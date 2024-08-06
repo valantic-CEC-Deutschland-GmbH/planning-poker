@@ -12,8 +12,7 @@ const SocketHandler = async (req: NextApiRequest, res: any) => {
       console.log('a user connected')
   
       socket.on('input-change', async (msg: string) => {
-        //TODO user donst update when loggin in works when outside if but then i get error to many handlers
-        const user = await getUser(req, res);
+        const user = await getUser(socket.handshake.auth.token, res);
         console.log(`${user?.email} changed input`)
   
         if (user) {
@@ -31,9 +30,7 @@ const SocketHandler = async (req: NextApiRequest, res: any) => {
   res.end();
 };
 
-const getUser = async (req: NextApiRequest, res: any): Promise<User | null> => {
-  const sessionId = req.cookies[lucia.sessionCookieName] ?? null;
-
+const getUser = async (sessionId: string, res: any): Promise<User | null> => {
   if (!sessionId) {
     return null;
   }
