@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { uuid } from "drizzle-orm/pg-core";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
@@ -20,3 +21,34 @@ export const room = sqliteTable("room", {
     name: text("name").notNull(),
     ownerId: integer("user_id").notNull().references(() => user.id),
 });
+
+export const roomUser = sqliteTable("room_user", {
+    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    roomId: text("room_id").notNull().references(() => room.id),
+    userId: integer("user_id").notNull().references(() => user.id),
+});
+
+export const roomUserRelations = relations(roomUser, ({ one }) => ({
+    user: one(user, {
+        fields: [roomUser.userId],
+        references: [user.id],
+    }),
+    room: one(room, {
+        fields: [roomUser.roomId],
+        references: [room.id],
+    }),
+}));
+
+export const userRelations = relations(user, ({ many }) => ({
+    roomUsers: many(roomUser, {
+        fields: [user.id],
+        references: [roomUser.userId],
+    }),
+}));
+
+export const roomRelations = relations(room, ({ many }) => ({
+    roomUsers: many(roomUser, {
+        fields: [room.id],
+        references: [roomUser.roomId],
+    }),
+}));

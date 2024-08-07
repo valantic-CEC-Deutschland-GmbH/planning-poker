@@ -15,7 +15,8 @@ export default async function RoomList({ params }: { params: { ownerId: number }
                             <span className="text-xl m-2 ml-4">{room.name}</span>
                             <div className="space-x-2">
                                 <Link href={`/room/${room.id}`} className="btn btn-primary">Open</Link>
-                                <button type="button" className="btn btn-secondary">Delete</button>
+                                <Link href={`/room/${room.id}/options`} className="btn btn-secondary">Options</Link>
+                                <button type="button" className="btn bg-base-100">Delete</button>
                             </div>
                         </div>
                     </div>

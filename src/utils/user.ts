@@ -4,7 +4,7 @@ import {cache} from 'react'
 import DatabaseUser from "@/interfaces/user";
 import {db} from "../../db";
 import {user} from "../../db/schema";
-import {eq} from "drizzle-orm";
+import {eq, like} from "drizzle-orm";
 
 export const getUser = cache(async () => {
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
@@ -36,6 +36,10 @@ export async function getUserByEmail(email: string): Promise<DatabaseUser | unde
 
 export async function getUserById(id: number): Promise<DatabaseUser | undefined> {
     return db.query.user.findFirst({where: eq(user.id, id)});
+}
+
+export async function getUsersBySimilarEmail(email: string): Promise<DatabaseUser[]> {
+    return db.query.user.findMany({where: like(user.email, `%${email}%`)});
 }
 
 export async function createUser(newUser: DatabaseUser) {

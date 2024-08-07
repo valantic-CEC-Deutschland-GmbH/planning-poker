@@ -12,4 +12,5 @@ export interface InputInterface {
     icon: ReactNode;
     autocomplete?: HTMLInputAutoCompleteAttribute;
     setter: (value: SetStateAction<string>) => void;
+    className?: string;
 }

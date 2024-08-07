@@ -2,7 +2,7 @@ import { InputInterface } from "@/interfaces/input";
 
 export default function Input(config: InputInterface) {
     return (
-        <label className="input input-bordered flex items-center gap-2">
+        <label className={`input input-bordered flex items-center gap-2 ${config.className}`}>
             { config.icon }
             <input
                 type={config.type}
