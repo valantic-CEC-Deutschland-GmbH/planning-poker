@@ -6,10 +6,11 @@ import io, { Socket } from 'socket.io-client'
 let socket: Socket
 
 export interface Chat {
-    cookie: string
+    roomId: string
+    sessionId: string
 } 
 
-const Chat = (chat: Chat) => {
+export default function Chat(chat: Chat) {
   const [input, setInput] = useState('')
 
   useEffect(() => {
@@ -19,13 +20,15 @@ const Chat = (chat: Chat) => {
   const socketInitializer = async () => {
     //create ws
     await fetch('/api/socket')
-    //socket = io()
 
-    console.log(chat.cookie)
+    console.log(chat.sessionId)
 
     socket = io('http://localhost:3000', {
       auth: {
-        token: chat.cookie
+        token: chat.sessionId,
+      },
+      query: {
+        "roomId": chat.roomId
       }
     });
 
@@ -58,5 +61,3 @@ const Chat = (chat: Chat) => {
     </div>
   )
 }
-
-export default Chat

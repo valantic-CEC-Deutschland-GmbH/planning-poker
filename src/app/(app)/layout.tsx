@@ -14,14 +14,13 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({children}: Readonly<{ children: React.ReactNode;}>) {
-
-    
-
     return (
         <html className="min-h-dvh h-full bg-base-100" data-theme="valanticDark">
             <body className="h-full">
                 <Navbar />
-                {children}
+                <main className="mt-20 p-8 md:p-4 max-w-7xl w-full mx-auto">
+                    {children}
+                </main>
                 <ToastContainer {...toastDefaultOptions} />
             </body>
         </html>

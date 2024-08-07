@@ -1,5 +1,5 @@
 {
-  "name": "next-ws-socket-io-v2",
+  "name": "planning-poker",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,12 +22,14 @@
     "react-dom": "^18",
     "react-toastify": "^10.0.5",
     "socket.io": "^4.7.5",
-    "socket.io-client": "^4.7.5"
+    "socket.io-client": "^4.7.5",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
     "better-sqlite3": "^11.1.2",
     "daisyui": "^4.12.10",
     "drizzle-kit": "^0.23.1",

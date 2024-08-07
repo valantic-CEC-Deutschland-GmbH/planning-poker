@@ -9,7 +9,9 @@ const SocketHandler = async (req: NextApiRequest, res: any) => {
     res.socket.server.io = new Server(res.socket.server);
 
     res.socket.server.io.on('connection', (socket: any) => {
-      console.log('a user connected')
+      socket.join(socket.handshake.query.roomId);
+
+      console.log(`a user connected to room: ${socket.handshake.query.roomId}`)
   
       socket.on('input-change', async (msg: string) => {
         const user = await getUser(socket.handshake.auth.token, res);
@@ -17,7 +19,7 @@ const SocketHandler = async (req: NextApiRequest, res: any) => {
   
         if (user) {
           console.log(`User ${user.email} connected`);
-          socket.broadcast.emit('update-input', msg);
+          socket.to(socket.handshake.query.roomId).emit('update-input', msg)
         }
       });
   

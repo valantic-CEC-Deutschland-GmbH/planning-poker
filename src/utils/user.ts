@@ -13,7 +13,7 @@ export const getUser = cache(async () => {
     
     const {user, session} = await lucia.validateSession(sessionId);
     try {
-        //Session but not fresh (true = not fesh and has to be refreshed)
+        //Session but not fresh (true = not fresh and has to be refreshed)
         if (session && session.fresh) {
             const sessionCookie = lucia.createSessionCookie(session.id);
             cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
@@ -32,6 +32,10 @@ export const getUser = cache(async () => {
 
 export async function getUserByEmail(email: string): Promise<DatabaseUser | undefined> {
     return db.query.user.findFirst({where: eq(user.email, email)});
+}
+
+export async function getUserById(id: number): Promise<DatabaseUser | undefined> {
+    return db.query.user.findFirst({where: eq(user.id, id)});
 }
 
 export async function createUser(newUser: DatabaseUser) {
