@@ -1,6 +1,6 @@
 import NewRoomForm from "@/components/room/form";
 import RoomList from "@/components/room/list";
-import { getUser } from "@/utils/user";
+import { getUser } from "@/utils/auth";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {

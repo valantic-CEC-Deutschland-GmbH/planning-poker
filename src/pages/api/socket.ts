@@ -1,30 +1,45 @@
+import DatabaseUser from '@/interfaces/user';
 import { lucia } from '@/utils/auth';
-import { User } from 'lucia';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { getRoomByRoomIdAndOwnerId } from '@/utils/room';
+import { getRoomUserByIds } from '@/utils/roomUser';
+import { getUserById } from '@/utils/user';
+import { NextApiRequest } from 'next';
 import { Server } from 'socket.io';
 
 const SocketHandler = async (req: NextApiRequest, res: any) => {
   if (!res.socket.server.io) {
-    console.log('Socket is initializing');
     res.socket.server.io = new Server(res.socket.server);
 
-    res.socket.server.io.on('connection', (socket: any) => {
-      socket.join(socket.handshake.query.roomId);
+    res.socket.server.io.on('connection', async (socket: any) => {
+      const roomId = socket.handshake.query.roomId;
+      const sessionId = socket.handshake.auth.token
 
-      console.log(`a user connected to room: ${socket.handshake.query.roomId}`)
-  
-      socket.on('input-change', async (msg: string) => {
-        const user = await getUser(socket.handshake.auth.token, res);
-        console.log(`${user?.email} changed input`)
-  
-        if (user) {
-          console.log(`User ${user.email} connected`);
-          socket.to(socket.handshake.query.roomId).emit('update-input', msg)
+      const user = await isConnectedValid(sessionId, roomId)
+      if (!user) {
+        return;
+      }
+
+      socket.join(roomId);
+      socket.to(roomId).emit('connected', `User ${user.firstName} ${user.lastName} connected`)
+
+      socket.on('input', async (msg: string) => {
+        const user = await isConnectedValid(sessionId, roomId)
+
+        if (!user) {
+          return;
         }
+
+        socket.to(roomId).emit('update', msg)
       });
-  
-      socket.on('disconnect', () => {
-        console.log('disconnected');
+
+      socket.on('disconnect', async () => {
+        const user = await isConnectedValid(sessionId, roomId)
+
+        if (!user) {
+          return;
+        }
+
+        socket.to(roomId).emit('disconnected', `User ${user.firstName} ${user.lastName} disconnected`)
       });
     });
   }
@@ -32,24 +47,34 @@ const SocketHandler = async (req: NextApiRequest, res: any) => {
   res.end();
 };
 
-const getUser = async (sessionId: string, res: any): Promise<User | null> => {
+const isConnectedValid = async (sessionId: string, roomId: string): Promise<DatabaseUser | undefined> => {
+  const user = await getUser(sessionId);
+  if (!user || !user.id) return undefined;
+
+  const roomUser = await getRoomUserByIds(roomId, user.id)
+  if (!roomUser) {
+    const room = await getRoomByRoomIdAndOwnerId(roomId, user.id)
+
+    if (!room) {
+      return undefined
+    }
+  }
+
+  return user
+}
+
+const getUser = async (sessionId: string): Promise<DatabaseUser | undefined> => {
   if (!sessionId) {
-    return null;
+    return undefined;
   }
 
   const { user, session } = await lucia.validateSession(sessionId);
 
-  if (session && session.fresh) {
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    res.setHeader('Set-Cookie', sessionCookie);
+  if (!session || (session && session.fresh)) {
+    return undefined
   }
 
-  if (!session) {
-    const sessionCookie = lucia.createBlankSessionCookie();
-    res.setHeader('Set-Cookie', sessionCookie);
-  }
-
-  return user
+  return await getUserById(user.id)
 };
 
 export default SocketHandler;

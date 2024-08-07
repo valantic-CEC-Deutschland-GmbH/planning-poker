@@ -1,6 +1,5 @@
 import Chat from "@/components/ws/chat";
-import { lucia } from "@/utils/auth";
-import { getUser } from "@/utils/user"
+import { getUser, lucia } from "@/utils/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation"
 

@@ -25,3 +25,9 @@ export async function createRoom(newRoom: DatabaseRoom): Promise<string> {
 export async function getRoomsByOwnerId(id: number): Promise<DatabaseRoom[]> {
     return db.query.room.findMany({where: eq(room.ownerId, id)});
 }
+
+export async function getRoomByRoomIdAndOwnerId(id: string, ownerId: number): Promise<DatabaseRoom|undefined> {
+    return db.query.room.findFirst({
+        where: ((room, { eq, and}) => and(eq(room.id, id), eq(room.ownerId, ownerId)))
+    });
+}

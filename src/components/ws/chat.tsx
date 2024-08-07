@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import io, { Socket } from 'socket.io-client'
+import { addToast, ToastType } from '../ui/toast/toast'
 
 let socket: Socket
 
@@ -13,16 +14,17 @@ export interface Chat {
 export default function Chat(chat: Chat) {
   const [input, setInput] = useState('')
 
-  useEffect(() => {
-    socketInitializer()
-  }, [])
+  //check because of next Link else new connection will be opened and your are connected multiple times
+  if (!socket) {
+    useEffect(() => {
+      socketInitializer()
+    }, [])
+  }
 
   const socketInitializer = async () => {
-    //create ws
+    
+    //create ws TODO creates to many connections idk why yet
     await fetch('/api/socket')
-
-    console.log(chat.sessionId)
-
     socket = io('http://localhost:3000', {
       auth: {
         token: chat.sessionId,
@@ -36,14 +38,24 @@ export default function Chat(chat: Chat) {
       console.log('connected')
     })
 
-    socket.on('update-input', (msg: string) => {
+    socket.on('update', (msg: string) => {
       setInput(msg)
+    })
+
+    //To many info toasts on other users side
+    socket.on('connected', (msg: string) => {
+      addToast(ToastType.INFO, msg)
+    })
+
+    //Same her
+    socket.on('disconnected', (msg: string) => {
+      addToast(ToastType.INFO, msg)
     })
   }
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
-    socket.emit('input-change', e.target.value)
+    socket.emit('input', e.target.value)
   }
 
   return (
