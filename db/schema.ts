@@ -38,17 +38,3 @@ export const roomUserRelations = relations(roomUser, ({ one }) => ({
         references: [room.id],
     }),
 }));
-
-export const userRelations = relations(user, ({ many }) => ({
-    roomUsers: many(roomUser, {
-        fields: [user.id],
-        references: [roomUser.userId],
-    }),
-}));
-
-export const roomRelations = relations(room, ({ many }) => ({
-    roomUsers: many(roomUser, {
-        fields: [room.id],
-        references: [roomUser.roomId],
-    }),
-}));

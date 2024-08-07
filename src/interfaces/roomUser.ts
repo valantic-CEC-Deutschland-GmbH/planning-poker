@@ -7,7 +7,7 @@ export interface DatabaseRoomUser {
 }
 
 export interface DatabaseRoomUserWithUser extends DatabaseRoomUser {
-    user: {
+    user?: {
         id: number;
         email: string;
         password: string;

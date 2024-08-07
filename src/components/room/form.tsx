@@ -19,7 +19,7 @@ export default function NewRoomForm(options: NewRoomOptions) {
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
 
-        const response = await fetch('/api/room/create', {
+        const response = await fetch('/api/room', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, ownerId: options.ownerId }),
@@ -28,11 +28,11 @@ export default function NewRoomForm(options: NewRoomOptions) {
         const data: NewRoomResponseInterface = await response.json()
 
         if (data.message) {
-            addToast(data.isSuccess ? ToastType.SUCCESS : ToastType.ERROR, data.message)
+            addToast(data.isSuccess ? ToastType.SUCCESS : ToastType.ERROR, data.isSuccess ? 'Room was created' : data.message)
         }
 
         if (data.isSuccess) {
-            router.push('/')
+            router.push(`/room/${data.message}/options`)
         }
 
         data.errors.map(error => {

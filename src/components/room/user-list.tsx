@@ -12,7 +12,7 @@ import { DatabaseRoomUserWithUser } from "@/interfaces/roomUser"
 export default function RoomUserList({ params }: { params: { roomId: string } }) {
     const [email, setEmail] = useState('')
     const [searchUsers, setSearchUsers] = useState<DatabaseUser[]>([])
-    const [users, setUsers] = useState<DatabaseRoomUserWithUser[]>([])
+    const [roomUsers, setRoomUsers] = useState<DatabaseRoomUserWithUser[]>([])
 
     //Only call once could be that it is rendered more the once due to react/nextJs
     useEffect(() => {
@@ -23,7 +23,7 @@ export default function RoomUserList({ params }: { params: { roomId: string } })
         event.preventDefault()
 
         if (email) {
-            const response = await fetch(`/api/user/find/like/${email}`)
+            const response = await fetch(`/api/user?like=${email}`)
             const data: DatabaseUser[] = await response.json()
 
             setSearchUsers(data)
@@ -37,7 +37,7 @@ export default function RoomUserList({ params }: { params: { roomId: string } })
 
         console.log(userId)
 
-        const response = await fetch('/api/room/user/create', {
+        const response = await fetch('/api/room/user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ roomId: params.roomId, userId: userId }),
@@ -59,11 +59,36 @@ export default function RoomUserList({ params }: { params: { roomId: string } })
         })
     }
 
+    async function handleDelete(roomId: number|undefined) {
+        if (!roomId) return
+
+        const response = await fetch('/api/room/user', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: roomId }),
+        })
+
+        //TODO
+        const data: NewRoomResponseInterface = await response.json()
+
+        if (data.message) {
+            addToast(data.isSuccess ? ToastType.SUCCESS : ToastType.ERROR, data.message)
+        }
+
+        if (data.isSuccess) {
+            loadUsers()
+        }
+
+        data.errors.map(error => {
+            addToast(ToastType.ERROR, error)
+        })
+    }
+
 
     async function loadUsers() {
-        const response = await fetch(`/api/room/user/findMany/${params.roomId}/`)
+        const response = await fetch(`/api/room/user?roomId=${params.roomId}&user=1`)
         const roomUsers: DatabaseRoomUserWithUser[] = await response.json()
-        setUsers(roomUsers)
+        setRoomUsers(roomUsers)
     }
 
     return (
@@ -91,17 +116,17 @@ export default function RoomUserList({ params }: { params: { roomId: string } })
             <div>
                 <div className="flex w-full flex-col">
                     <h2 className="text-3xl">Users</h2>
-                    {users.map(user => (
-                        <div key={user.id}>
+                    {roomUsers.map(roomUser => (
+                        <div key={roomUser.id}>
                             <div className="divider"></div>
                             <div className="card bg-base-300 rounded-box h-20 p-3 flex flex-row justify-between items-center">
                                 <span className="text-xl m-2 ml-4">
-                                    {user.user?.firstName} {user.user?.lastName}
+                                    {roomUser.user?.firstName} {roomUser.user?.lastName}
                                 </span>
                                 <span className="text-xl font-light m-2 ml-4">
-                                    {user.user?.email}
+                                    {roomUser.user?.email}
                                 </span>
-                                <button type="button" className="btn btn-sm btn-primary">
+                                <button type="button" className="btn btn-sm btn-primary" onClick={() => handleDelete(roomUser.id)}>
                                     <XMarkIcon className="h-6 opacity-70" />
                                 </button>
                             </div>

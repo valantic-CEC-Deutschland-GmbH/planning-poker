@@ -1,6 +1,19 @@
+import { getUsersBySimilarEmail } from "@/utils/user";
+import { NextRequest } from "next/server";
 import { AuthResponseInterface } from "@/interfaces/auth";
 import {createUser, getUserByEmail} from "@/utils/user";
 import {Argon2id} from "oslo/password";
+
+export async function GET(request: NextRequest, { params }: { params: { email: string } }) {
+    const like = request.nextUrl.searchParams.get('like')
+
+    if (like) {
+        const users = await getUsersBySimilarEmail(like)
+        return Response.json(users, { status: 200 })
+    }
+    
+    return Response.json(null, { status: 422 })
+}
 
 export async function POST(request: Request) {
     const data = await request.json()
