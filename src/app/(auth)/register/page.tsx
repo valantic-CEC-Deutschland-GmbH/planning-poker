@@ -1,5 +1,5 @@
 import Link from "next/link";
-import {getUser} from "@/utils/user";
+import {getUser} from "@/utils/auth";
 import {redirect} from "next/navigation";
 import RegisterForm from "@/components/register/form";
 

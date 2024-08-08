@@ -12,9 +12,9 @@ export default function Navbar() {
     return (
         <div className="navbar bg-base-300">
             <div className="navbar-start">
-                <Link className="btn btn-ghost text-xl" href="/">
+                <a className="btn btn-ghost text-xl" href="/">
                     <img className="h-10"src="/valantic-logo-white.png"/>
-                </Link>
+                </a>
             </div>
             <div className="navbar-end lg:flex">
                 <ul className="menu menu-horizontal px-1">

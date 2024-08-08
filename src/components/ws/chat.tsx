@@ -3,34 +3,33 @@
 import { useEffect, useState } from 'react'
 import io, { Socket } from 'socket.io-client'
 import { addToast, ToastType } from '../ui/toast/toast'
+import DatabaseRoom from '@/interfaces/room'
+import { DatabaseEstimationWithUser } from '@/interfaces/estimation'
 
 let socket: Socket
 
-export interface Chat {
-    roomId: string
-    sessionId: string
-} 
+export default function Chat({ params }: { params: { sessionId: string, userId: number, room: DatabaseRoom, roomUserId: number } }) {
+  const [shown, setShown] = useState(params.room.status === 1 ? true : false)
+  const [estimations, setEstimations] = useState<DatabaseEstimationWithUser[]>([])
 
-export default function Chat(chat: Chat) {
-  const [input, setInput] = useState('')
+  const userId = params.userId
+  const room = params.room
+  const ownerId = room.ownerId
 
-  //check because of next Link else new connection will be opened and your are connected multiple times
-  if (!socket) {
-    useEffect(() => {
+  useEffect(() => {
+    if (!socket) {
       socketInitializer()
-    }, [])
-  }
+    }
+  }, [])
 
   const socketInitializer = async () => {
-    
-    //create ws TODO creates to many connections idk why yet
     await fetch('/api/socket')
     socket = io('http://localhost:3000', {
       auth: {
-        token: chat.sessionId,
+        token: params.sessionId,
       },
       query: {
-        "roomId": chat.roomId
+        "roomId": room.id
       }
     });
 
@@ -38,38 +37,61 @@ export default function Chat(chat: Chat) {
       console.log('connected')
     })
 
-    socket.on('update', (msg: string) => {
-      setInput(msg)
+    socket.on('estimations', (msg: string) => {
+      setEstimations(JSON.parse(msg))
     })
 
-    //To many info toasts on other users side
     socket.on('connected', (msg: string) => {
       addToast(ToastType.INFO, msg)
     })
 
-    //Same her
     socket.on('disconnected', (msg: string) => {
       addToast(ToastType.INFO, msg)
     })
   }
 
-  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value)
-    socket.emit('input', e.target.value)
+  async function handleClick() {
+    socket.emit('show-estimations', JSON.stringify({
+      id: room.id,
+      status: !shown ? 1 : 0,
+    }))
+    setShown(!shown)
   }
 
+  async function handleAddEstimation(time: number) {
+    socket.emit('add-estimation', JSON.stringify({
+      roomUserId: params.roomUserId,
+      estimation: time
+    }))
+  }
+
+  //TODO configurable in options
+  const availableTimes = [1,2,4,6,8,10,12,14,16,18,20,22,24,28,32,36,40]
+
   return (
-    <div className="mb-6">
-      <label 
-        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >Large input</label>
-      <input
-        onChange={onChangeHandler}
-        value={input}
-        type="text"
-        id="large-input"
-        className="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      />
+    <div className="mb-6 space-y-6">
+      {userId === ownerId && (<button type="button" className="btn btn-primary" onClick={() => handleClick()}>{!shown ? 'Show estimations' : 'Hide estimations'}</button>)}
+      <section className="grid grid-col-4 md:grid-cols-8 gap-4">
+        {availableTimes.map(time => (
+          <div className="card bg-base-300 w-full shadow-xl cursor-pointer" key={time} onClick={() => handleAddEstimation(time)}>
+            <div className="card-body">
+              <h2 className="card-title text-4xl">{time} h</h2>
+            </div>
+          </div>
+        ))}
+      </section>
+      <div className='divider' />
+      <section className="grid grid-col-2 md:grid-cols-4 gap-4">
+        {estimations.map(estimation => (
+          <div className="card bg-base-300 w-full shadow-xl cursor-pointer" key={estimation.id} >
+            <div className="card-body">
+              <h2 className="card-title text-4xl">{estimation.time} h</h2>
+              <div className='divider' />
+              <span>{estimation.roomUser.user.firstName} {estimation.roomUser.user.lastName}</span>
+            </div>
+          </div>
+        ))}
+      </section>
     </div>
   )
 }

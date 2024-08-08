@@ -19,6 +19,7 @@ export const room = sqliteTable("room", {
     id: text("id").notNull().primaryKey(),
     name: text("name").notNull(),
     ownerId: integer("user_id").notNull().references(() => user.id),
+    status: integer("status").notNull(),
 });
 
 export const roomUser = sqliteTable("room_user", {
@@ -29,7 +30,7 @@ export const roomUser = sqliteTable("room_user", {
 
 export const estimation = sqliteTable("estimation", {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    roomUserId: text("room_user_id").notNull().references(() => roomUser.id),
+    roomUserId: integer("room_user_id").notNull().references(() => roomUser.id),
     time: integer("time").notNull()
 });
 
@@ -43,4 +44,12 @@ export const roomUserRelations = relations(roomUser, ({ one }) => ({
         fields: [roomUser.roomId],
         references: [room.id],
     }),
+    estimation: one(estimation),
 }));
+
+export const estimationRelations = relations(estimation, ({ one }) => ({
+    roomUser: one(roomUser, {
+      fields: [estimation.roomUserId],
+      references: [roomUser.id],
+    }),
+  }));

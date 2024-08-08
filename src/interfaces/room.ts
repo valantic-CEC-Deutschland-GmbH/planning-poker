@@ -2,6 +2,7 @@ export default interface DatabaseRoom {
     id?: string;
     name: string;
     ownerId: number;
+    status: number;
 }
 
 /**

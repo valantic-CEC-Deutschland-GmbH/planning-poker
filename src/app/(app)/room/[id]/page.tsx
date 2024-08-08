@@ -1,5 +1,7 @@
 import Chat from "@/components/ws/chat";
 import { getUser, lucia } from "@/utils/auth";
+import { getRoomById } from "@/utils/room";
+import { getRoomUserByIds } from "@/utils/roomUser";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation"
 
@@ -12,41 +14,25 @@ export default async function Room({ params }: { params: { id: string } }) {
 
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? '';
 
+    const room = await getRoomById(params.id)
+
+    if (!room) {
+        redirect('/')
+    }
+
+    const roomUser = await getRoomUserByIds(room.id, user.id)
+
+    if (!roomUser?.id) {
+        redirect('/')
+    }
+
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl">Room: {params.id}</h1>
-            <Chat sessionId={sessionId} roomId={params.id} />
-
-            <section className="grid grid-col-2 md:grid-cols-4 gap-4">
-                <div className="card bg-base-300 w-full shadow-xl">
-                    <div className="card-body">
-                        <h2 className="card-title text-4xl">24 h</h2>
-                        <div className="divider"></div>
-                        <p>{user.email}</p>
-                    </div>
-                </div>
-                <div className="card bg-base-300 w-full shadow-xl">
-                    <div className="card-body">
-                        <h2 className="card-title text-4xl">24 h</h2>
-                        <div className="divider"></div>
-                        <p>{user.email}</p>
-                    </div>
-                </div>
-                <div className="card bg-base-300 w-full shadow-xl">
-                    <div className="card-body">
-                        <h2 className="card-title text-4xl">24 h</h2>
-                        <div className="divider"></div>
-                        <p>{user.email}</p>
-                    </div>
-                </div>
-                <div className="card bg-base-300 w-full shadow-xl">
-                    <div className="card-body">
-                        <h2 className="card-title text-4xl">24 h</h2>
-                        <div className="divider"></div>
-                        <p>{user.email}</p>
-                    </div>
-                </div>
-            </section>
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl">Room: {room.name}</h1>
+            </div>
+            
+            <Chat params={{sessionId: sessionId, userId: user.id, room: room, roomUserId: roomUser.id}} />
         </div>
     )
 }

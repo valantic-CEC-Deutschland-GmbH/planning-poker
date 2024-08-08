@@ -1,6 +1,6 @@
 import RoomUserList from "@/components/room/user-list";
 import { lucia } from "@/utils/auth";
-import { getUser } from "@/utils/user"
+import { getUser } from "@/utils/auth"
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation"
 
